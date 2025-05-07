@@ -43,6 +43,12 @@ BUTTONS = ["left", "right", "middle"]
 
 
 def find_and_init_boot_mouse():
+    """
+    Scan for an attached boot mouse connected via USB host.
+    If one is found initialize an instance of BootMouse class
+    and return it.
+    :return: The BootMouse instance or None if no mouse was found.
+    """
     mouse_interface_index, mouse_endpoint_address = None, None
     mouse_device = None
 
@@ -96,6 +102,17 @@ def find_and_init_boot_mouse():
 
 
 class BootMouse:
+    """
+    Helpler class that encapsulates the objects needed to interact with a boot
+    mouse, show a visible cursor on the display, and determine when buttons
+    were pressed.
+
+    :param device: The usb device instance for the mouse
+    :param endpoint_address: The address of the mouse endpoint
+    :param tilegrid: The TileGrid that holds the visible mouse cursor
+    :param was_attached: Whether the usb device was attached to the kernel
+    """
+
     def __init__(self, device, endpoint_address, tilegrid, was_attached):
         self.device = device
         self.tilegrid = tilegrid
@@ -107,17 +124,34 @@ class BootMouse:
 
     @property
     def x(self):
+        """
+        The x coordinate of the mouse cursor
+        """
         return self.tilegrid.x
 
     @property
     def y(self):
+        """
+        The y coordinate of the mouse cursor
+        """
         return self.tilegrid.y
 
     def release(self):
+        """
+        Release the mouse cursor and re-attach it to the kernel
+        if it was attached previously.
+        """
         if self.was_attached and not self.device.is_kernel_driver_active(0):
             self.device.attach_kernel_driver(0)
 
     def update(self):
+        """
+        Read data from the USB mouse and update the location of the visible cursor
+        and check if any buttons are pressed.
+
+        :return: a List containing one or more of the strings "left", "right", "middle"
+          indicating which buttons are pressed.
+        """
         try:
             # attempt to read data from the mouse
             # 20ms timeout, so we don't block long if there
