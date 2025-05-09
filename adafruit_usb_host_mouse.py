@@ -113,7 +113,7 @@ class BootMouse:
     :param was_attached: Whether the usb device was attached to the kernel
     """
 
-    def __init__(self, device, endpoint_address, tilegrid, was_attached, scale=1):
+    def __init__(self, device, endpoint_address, tilegrid, was_attached, scale=1):  # noqa: PLR0913, too many args
         self.device = device
         self.tilegrid = tilegrid
         self.endpoint = endpoint_address
@@ -174,8 +174,12 @@ class BootMouse:
 
         # update the mouse tilegrid x and y coordinates
         # based on the delta values read from the mouse
-        self.tilegrid.x = max(0, min((self.display_size[0] // self.scale) - 1, self.tilegrid.x + self.buffer[1]))
-        self.tilegrid.y = max(0, min((self.display_size[1] // self.scale) - 1, self.tilegrid.y + self.buffer[2]))
+        self.tilegrid.x = max(
+            0, min((self.display_size[0] // self.scale) - 1, self.tilegrid.x + self.buffer[1])
+        )
+        self.tilegrid.y = max(
+            0, min((self.display_size[1] // self.scale) - 1, self.tilegrid.y + self.buffer[2])
+        )
 
         pressed_btns = []
         for i, button in enumerate(BUTTONS):
