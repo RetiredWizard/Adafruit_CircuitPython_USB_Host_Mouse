@@ -113,12 +113,13 @@ class BootMouse:
     :param was_attached: Whether the usb device was attached to the kernel
     """
 
-    def __init__(self, device, endpoint_address, tilegrid, was_attached):
+    def __init__(self, device, endpoint_address, tilegrid, was_attached, scale=1):
         self.device = device
         self.tilegrid = tilegrid
         self.endpoint = endpoint_address
-        self.buffer = array.array("b", [0] * 8)
+        self.buffer = array.array("b", [0] * 4)
         self.was_attached = was_attached
+        self.scale = scale
 
         self.display_size = (supervisor.runtime.display.width, supervisor.runtime.display.height)
 
@@ -129,12 +130,20 @@ class BootMouse:
         """
         return self.tilegrid.x
 
+    @x.setter
+    def x(self, new_x):
+        self.tilegrid.x = new_x
+
     @property
     def y(self):
         """
         The y coordinate of the mouse cursor
         """
         return self.tilegrid.y
+
+    @y.setter
+    def y(self, new_y):
+        self.tilegrid.y = new_y
 
     def release(self):
         """
@@ -160,11 +169,13 @@ class BootMouse:
         except usb.core.USBTimeoutError:
             # skip the rest if there is no data
             return None
+        except usb.core.USBError:
+            return None
 
         # update the mouse tilegrid x and y coordinates
         # based on the delta values read from the mouse
-        self.tilegrid.x = max(0, min((self.display_size[0]) - 1, self.tilegrid.x + self.buffer[1]))
-        self.tilegrid.y = max(0, min((self.display_size[1]) - 1, self.tilegrid.y + self.buffer[2]))
+        self.tilegrid.x = max(0, min((self.display_size[0] // self.scale) - 1, self.tilegrid.x + self.buffer[1]))
+        self.tilegrid.y = max(0, min((self.display_size[1] // self.scale) - 1, self.tilegrid.y + self.buffer[2]))
 
         pressed_btns = []
         for i, button in enumerate(BUTTONS):
