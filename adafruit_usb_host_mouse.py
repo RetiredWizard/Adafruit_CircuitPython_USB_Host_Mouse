@@ -42,7 +42,7 @@ __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_USB_Host_Mouse.gi
 BUTTONS = ["left", "right", "middle"]
 
 
-def find_and_init_boot_mouse():
+def find_and_init_boot_mouse(cursor_image="/launcher_assets/mouse_cursor.bmp"):
     """
     Scan for an attached boot mouse connected via USB host.
     If one is found initialize an instance of BootMouse class
@@ -87,7 +87,9 @@ def find_and_init_boot_mouse():
         mouse_device.set_configuration()
 
         # load the mouse cursor bitmap
-        mouse_bmp = OnDiskBitmap("/launcher_assets/mouse_cursor.bmp")
+        if not isinstance(cursor_image, str):
+            raise TypeError("cursor_image must be a string")
+        mouse_bmp = OnDiskBitmap(cursor_image)
 
         # make the background pink pixels transparent
         mouse_bmp.pixel_shader.make_transparent(0)
