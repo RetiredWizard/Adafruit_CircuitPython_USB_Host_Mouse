@@ -173,7 +173,6 @@ class BootMouse:
     def y(self, new_y: int) -> None:
         self.tilegrid.y = int(new_y)
 
-
     def release(self):
         """
         Release the mouse cursor and re-attach it to the kernel
