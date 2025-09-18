@@ -145,7 +145,10 @@ class BootMouse:
         """The scale of the group that the Mouse TileGrid will be put into.
         Needed in order to properly clamp the mouse to the display bounds."""
 
-        self._sensitivity = 1
+        self.sensitivity = 1
+        """The sensitivity of the mouse cursor. Larger values will make
+        the mouse cursor move slower relative to physical mouse movement. Default is 1."""
+
         self.display_size = (supervisor.runtime.display.width, supervisor.runtime.display.height)
 
     @property
@@ -170,15 +173,6 @@ class BootMouse:
     def y(self, new_y: int) -> None:
         self.tilegrid.y = int(new_y)
 
-    @property
-    def sensitivity(self) -> int:
-        """The sensitivity of the mouse cursor. Larger values will make
-        the mouse cursor move slower relative to physical mouse movement. Default is 1."""
-        return self._sensitivity
-
-    @sensitivity.setter
-    def sensitivity(self, new_sensitivity: int) -> None:
-        self._sensitivity = int(new_sensitivity)
 
     def release(self):
         """
@@ -213,14 +207,14 @@ class BootMouse:
             0,
             min(
                 (self.display_size[0] // self.scale) - 1,
-                self.tilegrid.x + (self.buffer[1] // self.sensitivity),
+                self.tilegrid.x + int(round((self.buffer[1] // self.sensitivity), 0)),
             ),
         )
         self.tilegrid.y = max(
             0,
             min(
                 (self.display_size[1] // self.scale) - 1,
-                self.tilegrid.y + (self.buffer[2] // self.sensitivity),
+                self.tilegrid.y + int(round((self.buffer[2] // self.sensitivity), 0)),
             ),
         )
 
