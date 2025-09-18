@@ -30,6 +30,7 @@ Implementation Notes
 """
 
 import array
+from traceback import print_exception
 
 import adafruit_usb_host_descriptors
 import supervisor
@@ -56,23 +57,34 @@ def find_and_init_boot_mouse(cursor_image="/launcher_assets/mouse_cursor.bmp"):
     print("scanning usb")
     for device in usb.core.find(find_all=True):
         # print device info
-        print(f"{device.idVendor:04x}:{device.idProduct:04x}")
-        print(device.manufacturer, device.product)
-        print()
-        config_descriptor = adafruit_usb_host_descriptors.get_configuration_descriptor(device, 0)
-        print(config_descriptor)
+        try:
+            try:
+                print(f"{device.idVendor:04x}:{device.idProduct:04x}")
+            except usb.core.USBError as e:
+                print_exception(e,e,None)
+            try:
+                print(device.manufacturer, device.product)
+            except usb.core.USBError as e:
+                print_exception(e,e,None)
+            print()
+            config_descriptor = adafruit_usb_host_descriptors.get_configuration_descriptor(device, 0)
+            print(config_descriptor)
 
-        _possible_interface_index, _possible_endpoint_address = (
-            adafruit_usb_host_descriptors.find_boot_mouse_endpoint(device)
-        )
-        if _possible_interface_index is not None and _possible_endpoint_address is not None:
-            mouse_device = device
-            mouse_interface_index = _possible_interface_index
-            mouse_endpoint_address = _possible_endpoint_address
-            print(
-                f"mouse interface: {mouse_interface_index} "
-                + f"endpoint_address: {hex(mouse_endpoint_address)}"
+            _possible_interface_index, _possible_endpoint_address = (
+                adafruit_usb_host_descriptors.find_boot_mouse_endpoint(device)
             )
+            if _possible_interface_index is not None and _possible_endpoint_address is not None:
+                mouse_device = device
+                mouse_interface_index = _possible_interface_index
+                mouse_endpoint_address = _possible_endpoint_address
+                print(
+                    f"mouse interface: {mouse_interface_index} "
+                    + f"endpoint_address: {hex(mouse_endpoint_address)}"
+                )
+                break
+            print("was not a boot mouse")
+        except usb.core.USBError as e:
+            print_exception(e,e,None)
 
     mouse_was_attached = None
     if mouse_device is not None:
