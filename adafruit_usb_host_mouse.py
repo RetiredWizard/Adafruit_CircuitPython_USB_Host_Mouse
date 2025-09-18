@@ -61,13 +61,15 @@ def find_and_init_boot_mouse(cursor_image="/launcher_assets/mouse_cursor.bmp"):
             try:
                 print(f"{device.idVendor:04x}:{device.idProduct:04x}")
             except usb.core.USBError as e:
-                print_exception(e,e,None)
+                print_exception(e, e, None)
             try:
                 print(device.manufacturer, device.product)
             except usb.core.USBError as e:
-                print_exception(e,e,None)
+                print_exception(e, e, None)
             print()
-            config_descriptor = adafruit_usb_host_descriptors.get_configuration_descriptor(device, 0)
+            config_descriptor = adafruit_usb_host_descriptors.get_configuration_descriptor(
+                device, 0
+            )
             print(config_descriptor)
 
             _possible_interface_index, _possible_endpoint_address = (
@@ -84,7 +86,7 @@ def find_and_init_boot_mouse(cursor_image="/launcher_assets/mouse_cursor.bmp"):
                 break
             print("was not a boot mouse")
         except usb.core.USBError as e:
-            print_exception(e,e,None)
+            print_exception(e, e, None)
 
     mouse_was_attached = None
     if mouse_device is not None:
