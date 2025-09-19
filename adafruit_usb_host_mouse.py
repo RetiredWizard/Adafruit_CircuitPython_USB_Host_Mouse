@@ -206,5 +206,4 @@ class BootMouse:
                 # it is being clicked.
                 pressed_btns.append(button)
 
-        if len(pressed_btns) > 0:
-            return pressed_btns
+        return tuple(pressed_btns)
