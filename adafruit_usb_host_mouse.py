@@ -174,8 +174,9 @@ class BootMouse:
         Read data from the USB mouse and update the location of the visible cursor
         and check if any buttons are pressed.
 
-        :return: a List containing one or more of the strings "left", "right", "middle"
-          indicating which buttons are pressed.
+        :return: a tuple containing one or more of the strings "left", "right", "middle"
+          indicating which buttons are pressed. If no buttons are pressed, the tuple will be empty.
+          If a error occurred while trying to read from the usb device, `None` will be returned.
         """
         try:
             # attempt to read data from the mouse
