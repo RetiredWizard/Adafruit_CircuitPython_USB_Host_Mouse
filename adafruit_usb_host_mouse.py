@@ -160,7 +160,7 @@ class BootMouse:
 
     @x.setter
     def x(self, new_x: int) -> None:
-        self.tilegrid.x = int(new_x)
+        self.tilegrid.x = new_x
 
     @property
     def y(self) -> int:
@@ -171,7 +171,7 @@ class BootMouse:
 
     @y.setter
     def y(self, new_y: int) -> None:
-        self.tilegrid.y = int(new_y)
+        self.tilegrid.y = new_y
 
     def release(self):
         """
@@ -206,14 +206,14 @@ class BootMouse:
             0,
             min(
                 (self.display_size[0] // self.scale) - 1,
-                self.tilegrid.x + int(round((self.buffer[1] // self.sensitivity), 0)),
+                self.tilegrid.x + int(round((self.buffer[1] / self.sensitivity), 0)),
             ),
         )
         self.tilegrid.y = max(
             0,
             min(
                 (self.display_size[1] // self.scale) - 1,
-                self.tilegrid.y + int(round((self.buffer[2] // self.sensitivity), 0)),
+                self.tilegrid.y + int(round((self.buffer[2] / self.sensitivity), 0)),
             ),
         )
 
