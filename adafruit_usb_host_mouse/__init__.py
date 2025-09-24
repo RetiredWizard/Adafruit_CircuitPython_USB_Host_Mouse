@@ -137,15 +137,28 @@ class BootMouse:
     :param endpoint_address: The address of the mouse endpoint
     :param was_attached: Whether the usb device was attached to the kernel
     :param tilegrid: The TileGrid that holds the visible mouse cursor
+    :param scale: The scale of the group that the Mouse TileGrid will be put into.
+      Needed in order to properly clamp the mouse to the display bounds
     """
 
     def __init__(self, device, endpoint_address, was_attached, tilegrid=None, scale=1):  # noqa: PLR0913, too many args
         self.device = device
+
+        self.tilegrid = tilegrid
+        """TileGrid containing the Mouse cursor graphic."""
+
         self.endpoint = endpoint_address
         self.buffer = array.array("b", [0] * 4)
         self.was_attached = was_attached
-        self.tilegrid = tilegrid
+
         self.scale = scale
+        """The scale of the group that the Mouse TileGrid will be put into.
+        Needed in order to properly clamp the mouse to the display bounds."""
+
+        self.sensitivity = 1
+        """The sensitivity of the mouse cursor. Larger values will make
+        the mouse cursor move slower relative to physical mouse movement. Default is 1."""
+
         if tilegrid is not None:
             self.display_size = (
                 supervisor.runtime.display.width,
@@ -158,28 +171,28 @@ class BootMouse:
             self._x, self._y = 0, 0
 
     @property
-    def x(self):
+    def x(self) -> int:
         """
         The x coordinate of the mouse cursor
         """
         return self.tilegrid.x if self.tilegrid else self._x
 
     @x.setter
-    def x(self, new_x):
+    def x(self, new_x: int) -> None:
         if self.tilegrid:
             self.tilegrid.x = new_x
         else:
             self._x = new_x
 
     @property
-    def y(self):
+    def y(self) -> int:
         """
         The y coordinate of the mouse cursor
         """
         return self.tilegrid.y if self.tilegrid else self._y
 
     @y.setter
-    def y(self, new_y):
+    def y(self, new_y: int) -> None:
         if self.tilegrid:
             self.tilegrid.y = new_y
         else:
@@ -198,8 +211,9 @@ class BootMouse:
         Read data from the USB mouse and update the location of the visible cursor
         and check if any buttons are pressed.
 
-        :return: a List containing one or more of the strings "left", "right", "middle"
-          indicating which buttons are pressed.
+        :return: a tuple containing one or more of the strings "left", "right", "middle"
+          indicating which buttons are pressed. If no buttons are pressed, the tuple will be empty.
+          If a error occurred while trying to read from the usb device, `None` will be returned.
         """
         try:
             # attempt to read data from the mouse
@@ -215,6 +229,8 @@ class BootMouse:
         # update the mouse x and y coordinates
         # based on the delta values read from the mouse
         dx, dy = self.buffer[1:3]
+        dx = int(round((dx / self.sensitivity), 0))
+        dy = int(round((dy / self.sensitivity), 0))
         if self.tilegrid:
             self.tilegrid.x = max(
                 0, min((self.display_size[0] // self.scale) - 1, self.tilegrid.x + dx)
@@ -235,5 +251,4 @@ class BootMouse:
                 # it is being clicked.
                 pressed_btns.append(button)
 
-        if len(pressed_btns) > 0:
-            return pressed_btns
+        return tuple(pressed_btns)
