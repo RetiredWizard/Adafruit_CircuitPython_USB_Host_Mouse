@@ -41,18 +41,18 @@ __version__ = "0.0.0+auto.0"
 __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_USB_Host_Mouse.git"
 
 BUTTONS = ["left", "right", "middle"]
+DEFAULT_CURSOR = "/".join(__file__.split("/")[:-1]) + "/mouse_cursor.bmp"
 
 
-def find_and_init_boot_mouse(cursor_image=None):  # noqa: PLR0912
+def find_and_init_boot_mouse(cursor_image=DEFAULT_CURSOR):  # noqa: PLR0912
     """
     Scan for an attached boot mouse connected via USB host.
-    If one is found initialize an instance of BootMouse class
+    If one is found initialize an instance of :class:`BootMouse` class
     and return it.
 
-    :param cursor_image: Provide the absolute path to the desired cursor bitmap image. If not
-      provided or set to `None`, the bitmap image included with this library will be used. If set as
-      `False`, the BootMouse instance will not control a :class:`displayio.TileGrid`.
-    :return: The BootMouse instance or None if no mouse was found.
+    :param cursor_image: Provide the absolute path to the desired cursor bitmap image. If set as
+      `None`, the :class:`BootMouse` instance will not control a :class:`displayio.TileGrid` object.
+    :return: The :class:`BootMouse` instance or None if no mouse was found.
     """
     mouse_interface_index, mouse_endpoint_address = None, None
     mouse_device = None
@@ -103,10 +103,6 @@ def find_and_init_boot_mouse(cursor_image=None):  # noqa: PLR0912
 
         # set configuration on the mouse so we can use it
         mouse_device.set_configuration()
-
-        # get path of included cursor bitmap
-        if cursor_image is None:
-            cursor_image = "/".join(__file__.split("/")[:-1]) + "/mouse_cursor.bmp"
 
         # load the mouse cursor bitmap
         if isinstance(cursor_image, str):
